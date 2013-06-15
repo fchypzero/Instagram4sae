@@ -1,0 +1,369 @@
+{% extends "layout.html" %}
+{%block style%}
+<style type="text/css">
+#content{
+  position: relative;
+}
+nav.next_page{
+  display: none;
+}
+#tag_panel dd{
+    float: left;
+ 
+}
+#tag_panel dd a{
+    display: block;
+    padding: 3px;
+}
+div.item-like{
+  background: url('/static/img/like.gif') 10px 9px no-repeat;
+  padding-left: 30px;
+}
+div.item-like-user-icon{
+  padding: 1px 2px;
+}
+div.profile{
+  /*
+   width:1180px;
+   max-width:1180px;
+   */
+   height: 80px;
+   padding:14px 3px;
+   position: relative;
+   margin:0 auto;
+}
+div.profilePicture img{
+  width:80px;
+  height: 80px;
+  
+padding:2px;
+border: solid 1px;
+}
+div.profilePicture{position: absolute;left:10px;
+padding: 5px;
+border-radius:5px;
+background: #fff;
+top:5px;
+}
+div.profileUpper,div.profileMiddleEx{padding-left: 110px}
+div.profilePicture,div.profileMiddleEx{float: left;}
+div.profileMiddleEx{}
+div.profileUserStats{position: absolute;right: 5px;top:8px;}
+div.profileAction{position: absolute;left: 114px;bottom:10px;}
+.profileUserFullName {
+  font-size: 14px;
+  font-weight: bold;
+  display: block;
+}
+div.stat{
+background: none repeat scroll 0 0 #E6E6E6;
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 0 1px #ccc, 0 1px 5px #ccc;
+    color: #424242;
+    float: left;
+    margin-right: 10px;
+    text-align: center;
+    text-shadow: 1px 1px 0 white;
+    width: 61px;
+}
+div.statName{
+  background: none repeat scroll 0 0 #586D7C;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    color: #FFFFFF;
+    font-size: 12px;
+    padding: 1px 5px;
+    text-shadow: none;
+
+}
+div.statNumber{
+  font-family: Georgia;
+  font-style: italic;
+  font-size: 11px;
+  padding:4px 5px;
+  
+}
+div.decoration{
+background: #ccc;
+border-bottom: solid 1px #ddd;
+}
+a.profileWebsite:hover{
+  text-decoration: underline;
+}
+.followBtn{
+width:173px;
+}
+
+
+a.fo,span.fostatus{
+  border-radius: 4px;
+  background: #ccc;
+  padding:6px;
+  text-align: center;
+  display:block;
+  width:80px;
+  cursor: pointer;
+  float:left;
+  margin-right: 7px;
+}
+a.fo:hover{
+  background:slateGray;
+  color:#fff;
+}
+span.fostatus{
+  cursor: default;
+  background: #fff;
+}
+.clickable{cursor:pointer;}
+</style>
+{%endblock%}
+{%block csslink%}
+<link rel="stylesheet" href="{{g.config['static']}}/static/css/lightbox.css" type="text/css" media="screen" />
+{%endblock%}
+{%block script%}
+<script src="{{g.config['static']}}/static/js/lightbox.js"></script>
+{%endblock%}
+{%block body%}
+<script type="text/javascript">
+var thisuser = {{user|tojson|safe}};
+var cursor = {'following':'','followers':''};
+$(function(){
+  $('#showfollowing,#showfollowers').click(function(){
+    mask();
+    var _this = $(this);
+    
+    var url='/relation/'+thisuser.username+'/';
+    $.getJSON(url,function(data){
+        if (data.following.pagination.next_cursor){
+          cursor.following= data.following.pagination.next_cursor;
+        }
+        if (data.followers.pagination.next_cursor){
+          cursor.followers= data.followers.pagination.next_cursor;
+        }
+        $('#relationTemplate').tmpl(data).appendTo('#relationwrap');
+        $('#userRelationTab li').removeClass('active');
+
+        $('#'+$(_this).attr('rel')).removeClass('hide');
+        $('#userRelationTab li').each(function(i,item){
+          if($(this).attr('toggle')==$(_this).attr('rel')){
+              $(this).addClass('active');
+          }
+        });
+        $('#relationwrap').show();
+
+    });
+  });
+});
+
+
+var nScrollHight = 0;
+var nScrollTop = 0;
+var nDivHight = 0;
+$(function(){
+    $('button.close').live('click',function(){
+        $('#relationwrap').hide();
+        mask(true);
+    });
+        
+    $('#userRelationTab li').live('click',function(){
+       $('#userRelationTab li').removeClass('active');
+       $(this).addClass('active');
+       $('div.tab-pane').addClass('hide');
+       $('#'+$(this).attr('rel')).removeClass('hide');
+    });
+        
+});
+var isload = [false,false];
+
+function loadfollowing(target){
+    if(isload[0] || cursor.following=='') return;
+    var _this = $(target);
+    nScrollHight = $(_this)[0].scrollHeight;
+    nScrollTop = $(_this)[0].scrollTop;
+    var url='/relation/following/'+thisuser.username+'/?cursor=';
+    url+=cursor.following;
+    if (nScrollHight-nScrollTop>100){
+       isload[0] = true;
+       $.getJSON(url,function(data){
+          if(data.pagination.next_cursor)
+              cursor.following = data.pagination.next_cursor;
+          else
+              cursor.following = '';
+          $('#relationItem').tmpl(data).appendTo('#userRelationFollowing div.content');
+          isload[0] = false;
+       });
+    }
+}
+
+function loadfollowers(target){
+  
+    if(isload[1] || cursor.followers=='') return;
+    var _this = $(target);
+    nScrollHight = $(_this)[0].scrollHeight;
+    nScrollTop = $(_this)[0].scrollTop;
+    var url='/relation/followers/'+thisuser.username+'/?cursor=';
+    url+=cursor.followers;
+    if (nScrollHight-nScrollTop>100){
+       isload[1]=true;
+       $.getJSON(url,function(data){
+          if(data.pagination.next_cursor)
+              cursor.followers = data.pagination.next_cursor;
+          else
+              cursor.followers = '';
+          $('#relationItem').tmpl(data).appendTo('#userRelationFollowers div.content');
+          isload[1] = false;
+       });
+    }
+}
+
+
+</script>
+
+<div id="relationwrap" class="modal">
+  
+</div>
+
+{%raw%}
+<script id="relationItem" type="text/x-jquery-tmpl">
+     {{each(i, u) data}}
+      <div class="userRelationUser">
+          <div class="profilePic">
+              <a target="_blank" href="/u/${u.username}/">
+                  <img alt="" src="${u.profile_picture}"></a>
+          </div>
+          <div class="profileLink">
+              <a target="_blank" href="/u/${u.username}">${u.username}</a></div>
+      </div>
+      {{/each}}
+</script>
+{%endraw%}
+
+
+<script id="relationTemplate" type="text/x-jquery-tmpl">
+<div class="modal-body">
+        <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+        <ul class="nav nav-pills" id="userRelationTab">
+            <li class="" rel="userRelationFollowers" toggle='userRelationFollowers'><a class="follower" data-toggle="tab" href="#followers"><i
+                class="icon-user icon-white"></i><span class="count">{{user.counts.followed_by}}</span>&nbsp;关注者</a></li>
+            <li class="" rel="userRelationFollowing" toggle='userRelationFollowing'><a class="following" data-toggle="tab" href="#following">
+                <i class="icon-user icon-white"></i><span class="count">{{user.counts.follows}}</span>&nbsp;关注中</a></li>
+        </ul>
+        <div class="tab-content" id="userRelationTabContent">
+            <div id="userRelationFollowing" class="tab-pane hide folow" onscroll="javascript:loadfollowing(this);">
+                <div class="content">
+                  {%raw%}
+                   {{tmpl(following) "#relationItem"}}
+                    {%endraw%}
+                </div>
+            </div>
+
+
+            <div id="userRelationFollowers" class="tab-pane hide" onscroll="javascript:loadfollowers(this);">
+                <div class="content">
+                  {%raw%}
+                   {{tmpl(followers) "#relationItem"}}
+                    {%endraw%}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</script>
+
+
+    <div class="profile">
+            <div class="profilePicture">
+                <img src="{{user.profile_picture}}" alt="">
+            </div>
+            <div class="profileUpper selectable">
+                <span class="profileUserName selectable"><a href="/u/{{user.username}}">{{user.username}}</a></span>
+               
+            </div>
+            <div class="profileMiddleEx">
+                <div class="selectable emojstext">
+                        <span class="profileUserFullName selectable">{{user.full_name}}</span>
+                       
+                        {%if user.website%}
+                        <a href="{{user.website}}" class="selectable profileWebsite" title="">{{user.website}}</a>
+                        {%endif%}
+                         {%if user.bio%}
+                        <span class="emojstext bio">{{user.bio}}</span>
+                        {%endif%}
+                </div>
+            </div>
+            {%if g.user and g.user[1].id !=user.id%}
+            <div class="profileAction">
+              <div class="follow">
+                 {%if isfollowing%}
+                  <a class="fo" onclick="follow({{user.id}},'undo');">正在关注</a>
+                {%else%}
+                  <a class="fo" onclick="follow({{user.id}},'do');">加为关注</a>
+                {%endif%}
+
+                {%if isfollower%}
+                    <span class="fostatus">正在关注你</span>
+                {%endif%}
+              </div>
+            </div>
+            {%endif%}
+            <div class="profileUserStats">
+                <div class="stat clickable">
+                    <div class="statNumber decoration">{{user.counts.media}}</div>
+                    <div class="statName">张照片</div>
+                </div>
+                <div class="stat clickable" id="showfollowers" rel="userRelationFollowers">
+                    <div class="statNumber decoration">{{user.counts.followed_by}}</div>
+                    <div class="statName">关注者</div>
+                </div>
+                <div class="stat clickable" style="margin: 0;" rel="userRelationFollowing" id="showfollowing">
+                    <div class="statNumber decoration">{{user.counts.follows}}</div>
+                    <div class="statName">关注中</div>
+                </div>
+            </div>
+
+                  <div class="clear" style="clear:both"></div>
+
+        </div>
+
+    <div id="content" > 
+
+      
+
+
+       {%for a in photos%}
+     {% include 'item.html' %}
+    {%else%}
+      <p>没有一张照片或加载照片失败</p>
+        {%endfor%}
+    
+    </div>
+<div style="clear:both;">&nbsp;</div>
+
+
+
+    
+
+<script type="text/javascript">
+
+
+function follow(id,action){
+  if(!user)
+  {
+    showlogin();
+  }
+  else
+  {
+    $.getJSON('/follow/'+action+'/?uid='+id,function(data){
+        if(action=='do'){
+           $('a.fo').html('关注中').click(function(){follow(id,'undo');});
+        }
+        else
+        {
+           $('a.fo').html('关注').bind(function(){follow(id,'do');}); 
+        }
+    });
+  }
+}
+</script>
+
+{%endblock%}

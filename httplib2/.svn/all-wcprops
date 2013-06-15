@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/instagcn/!svn/ver/923/1/httplib2
+END
+cacerts.txt
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/instagcn/!svn/ver/923/1/httplib2/cacerts.txt
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/instagcn/!svn/ver/923/1/httplib2/__init__.py
+END
+socks.py
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/instagcn/!svn/ver/923/1/httplib2/socks.py
+END
+iri2uri.py
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/instagcn/!svn/ver/923/1/httplib2/iri2uri.py
+END

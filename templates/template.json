@@ -1,0 +1,53 @@
+   
+{% raw %}
+    <script id="itemTemplate" type="text/x-jquery-tmpl">
+        <div class="ks-waterfall" actioninit="true" id="${id}">
+          <div id="imgcover">
+            <div class="thumb-load">
+                  <img src="/static/img/pic-load.gif" alt="Loading" />
+            </div>
+            <a href="#1"  target="_blank"  class="link" rel="lightbox[plants]">
+            <img width="200" height="200" src="${images.low_resolution.url}" class="preview" alt="" lazy-src="" />
+            </a>
+          </div>
+          <div class="item-main">
+            <div class="item-content emojstext">
+                {{if caption.text}}
+                    ${caption.text}
+                {{/if}}
+            </div>
+          </div>
+          <div class="item-meta">
+            <span class="item-like-count" rel="${id}">${likes.count}</span>
+            <span class="item-comment-count">${comments.count}</span>
+          </div>
+          <div class="item-author">
+            <div class="item-meta-inner">
+              <a class="item-avatar" href=""><img width="32" height="32" class="avatar" alt="${user.username}" src="${user.profile_picture}"></a>
+              <a class="item-nick" href="/u/${user.username}/">${user.username}</a>
+              <small class="item-timestamp">${created_time}</small>
+            </div>
+          </div>
+          
+    {{if comments.count>0}}
+      <div class="item-comment">
+        {{each(i, comment) comments}}
+            <div class="item-meta-inner">
+              <a class="item-avatar" href="/u/${comment.from.username}/">
+                <img width="32" class="avatar" height="32" alt="${comment.from.username}" src="${comment.from.profile_picture}">
+              </a>
+              <p>
+                 <a href="/u/${comment.from.username}/">${comment.from.username}</a>
+              </p>
+              <small class="item-timestamp">${comment.created_time}</small>
+              <p class="item-comment-body emojstext clear">
+                ${comment.text}
+              </p>
+            </div>
+         {{/each}}
+      </div>
+      {{/if}}
+
+        </div>
+    </script>
+{% endraw %}

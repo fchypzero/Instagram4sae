@@ -1,0 +1,46 @@
+<div class="ks-waterfall" actioninit="true" id="{{a['id']}}">
+      <div id="imgcover">
+        <div class="thumb-load">
+              <img src="/static/img/pic-load.gif" alt="Loading" />
+        </div>
+        <a href="#1" rel="{{a['id']}}"  class="link">
+        <img width="200" height="200" src="{{a['images']['low_resolution']['url']}}" class="preview" alt="" lazy-src="{{a['images']['low_resolution']['url']}}"  />
+        </a>
+      </div>
+      <div class="item-main">
+        <div class="item-content emojstext">
+        {%if a['caption']%}
+        {{a['caption']['text']|tohtml|safe}}
+        {%endif%}
+        </div>
+      </div>
+      <div class="item-meta">
+        <span class="item-like-count" {%if not a.user_has_liked%}rel="{{a['id']}}"{%endif%}>{{a['likes']['count']}}{%if a.user_has_liked%}已赞{%endif%}</span>
+        <span class="item-comment-count">{{a['comments']['count']}}</span>
+      </div>
+      <div class="item-author">
+        <div class="item-meta-inner">
+          <a class="item-avatar" href="/u/{{a.user['username']}}/"><img width="32" height="32" class="avatar" alt="{{a.user['username']}}" src="{{a.user['profile_picture']}}"></a>
+          <a class="item-nick" href="/u/{{a.user['username']}}/">{{a.user['username']}}</a>
+          <small class="item-timestamp">{{a.created_time|datetime}}</small>
+        </div>
+      </div>
+      {%if a['comments']%}
+      <div class="item-comment">
+         {%for c in a['comments']['data'][:2] %}
+            <div class="item-meta-inner">
+              <a class="item-avatar" href="/u/{{c['from']['username']}}/">
+                <img width="32" class="avatar" height="32" alt="{{c['from']['username']}}" src="{{c['from']['profile_picture']}}">
+              </a>
+              <p>
+                 <a href="/u/{{c['from']['username']}}/">{{c['from']['username']}}</a>
+              </p>
+              <small class="item-timestamp">{{c['created_time']|datetime}}</small>
+              <p class="item-comment-body emojstext clear">
+                {{c['text']|tohtml|safe}}
+              </p>
+            </div>
+         {%endfor%}
+      </div>
+      {%endif%}
+    </div>
