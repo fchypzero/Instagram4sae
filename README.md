@@ -6,3 +6,7 @@
 需要在sae启用memcached。
 
 python+flask
+
+
+http://instagcn.sinaapp.com/
+
