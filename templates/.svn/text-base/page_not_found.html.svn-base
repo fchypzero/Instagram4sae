@@ -1,9 +1,0 @@
-{% extends "layout.html" %}
-{%block body%}
-<div>
-	<h3>404</h3>
-	<div>
-		对不起，您要造访的页面不存在～,<a href="/">返回首页</a>
-	</div>
-</div>
-{%endblock%}
